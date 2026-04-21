@@ -9,7 +9,9 @@ def get_files_info(working_directory, directory = "."):
     if not os.path.isdir(target_directory):
         return f'Error: "{directory}" is not a directory'
     try:
+        # Each file property entry contains info about something in a directory
         file_properties = []
+        # for each file in directory get its information
         for file in os.listdir(target_directory):
             file_path = os.path.join(target_directory,file)
             file_size = os.path.getsize(file_path)
