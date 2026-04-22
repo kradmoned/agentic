@@ -3,7 +3,7 @@ from google.genai import types
 import os
 import argparse
 from dotenv import load_dotenv
-
+from prompts import SYSTEM_PROMPT
 
 def main():
     # create an argument parser object
@@ -29,7 +29,7 @@ def main():
         # clients.model is a sub object that contains the contains the method generate content that can either take a string prompt
         # or it can take a types.content list where each types.content can be thought as a single message between user and model
         # Types.content has two fields one is role other is "parts" which is a list of part because each message can contain multiple part such as an image and text
-        response = client.models.generate_content(model = "gemini-2.5-flash",contents = message)
+        response = client.models.generate_content(model = "gemini-2.5-flash",contents = message, config= types.GenerateContentConfig(system_instruction= SYSTEM_PROMPT))
     except Exception as e:
         print(Exception)
     # Each response has some meta data attached to it
