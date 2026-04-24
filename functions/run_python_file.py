@@ -1,5 +1,6 @@
 import os
 import subprocess
+from google.genai import types
 
 def run_python_file(working_directory: str, file_path: str, args : list[str] | None = None):
     abs_working_directory = os.path.abspath(working_directory)
@@ -32,3 +33,27 @@ def run_python_file(working_directory: str, file_path: str, args : list[str] | N
         return output_string
     except Exception as e:
         return f"Error: executing Python file: {e}"
+
+schema_run_python_file = types.FunctionDeclaration(
+    name= "run_python_file",
+    description= "Run python file in a specified path relative to the working directory, optionally take arguments in the form of a list of strings, returns stdout and stderr if they occurred",
+    parameters= types.Schema(
+        type= types.Type.OBJECT,
+        properties={
+            "file_path": types.Schema(
+                type= types.Type.STRING,
+                description= "Path of a python file relative to the working directory"
+            ),
+            "args" : types.Schema(
+                type= types.Type.ARRAY,
+                description= "A list of optional command line string arguments to be passed to python program",
+                items= types.Schema(
+                    type= types.Type.STRING,
+                    description= "A single string argument"
+                )
+            ),
+
+        },
+        required=["file_path"]
+    )
+)
