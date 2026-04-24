@@ -36,7 +36,7 @@ def run_python_file(working_directory: str, file_path: str, args : list[str] | N
 
 schema_run_python_file = types.FunctionDeclaration(
     name= "run_python_file",
-    description= "Run python file in a specified path relative to the working directory, optionally take arguments in the form of a list of strings, returns stdout and stderr if they occurred",
+    description= "Use this as the only way to Run python program in a specified location relative to the working directory, optionally take arguments in the form of a list of strings, returns stdout and stderr if they occurred",
     parameters= types.Schema(
         type= types.Type.OBJECT,
         properties={

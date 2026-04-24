@@ -6,5 +6,7 @@ from functions.run_python_file import schema_run_python_file
 # types.FunctionDeclaration -- describes a single function (its name, description, and parameters).
 # types.Tool -- a container that holds a list of FunctionDeclaration objects (related functions grouped together).
 available_functions = types.Tool(
-    function_declarations=[schema_get_files_info, schema_get_file_content, schema_write_file, schema_run_python_file]
+    function_declarations=[
+        schema_run_python_file,
+        schema_get_file_content, schema_write_file, schema_get_files_info]
     )
