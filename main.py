@@ -5,6 +5,7 @@ import argparse
 from dotenv import load_dotenv
 from prompts import SYSTEM_PROMPT
 from call_function import available_functions
+from call_function import call_function
 def main():
     # create an argument parser object
     parser = argparse.ArgumentParser()
@@ -48,9 +49,20 @@ def main():
         print(f"Prompt tokens: {usage_metadata.prompt_token_count}")
         # showing the number of tokens in the model's response.
         print(f"Response tokens: {usage_metadata.candidates_token_count}")
+    function_call_results  = []
     if response.function_calls:
         for function_call in response.function_calls:
-            print(f"Calling function: {function_call.name}({function_call.args})")
+            function_call_result : types.Content = call_function(function_call, verbose= args.verbose)
+            if not function_call_result.parts:
+                raise Exception("Function call response has no parts")
+            if not function_call_result.parts[0].function_response:
+                raise Exception("call_function return has no function Response")
+            if not function_call_result.parts[0].function_response.response:
+                raise Exception("Call function return has no funtion response.response")
+            function_call_results.append(function_call_result.parts[0])
+            if args.verbose:
+                print(f"-> {function_call_result.parts[0].function_response.response}")
+        
     else:
         ("Response:")
         (response.text)
