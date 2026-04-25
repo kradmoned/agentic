@@ -24,49 +24,62 @@ def main():
     # Create a new instance of gemini client
     client = genai.Client(api_key=api_key)
     # get the response
-    message = [types.Content(role="user", parts=[types.Part(text = prompt)])]
+    messages = [types.Content(role="user", parts=[types.Part(text = prompt)])]
     # types.GenerateContentConfig -- takes a list of Tool objects via the tools parameter, alongside other config like system_instruction.
     config = types.GenerateContentConfig(system_instruction= SYSTEM_PROMPT, tools=[available_functions])
     response = None
-    try : 
-        # clients.model is a sub object that contains the contains the method generate content that can either take a string prompt
-        # or it can take a types.content list where each types.content can be thought as a single message between user and model
-        # Types.content has two fields one is role other is "parts" which is a list of part because each message can contain multiple part such as an image and text
-        #print([fd.name for fd in available_functions.function_declarations])
-        response = client.models.generate_content(model = "gemini-3.1-flash-lite-preview",contents = message, config= config)
-    except Exception as e:
-        print(e)
-    # Each response has some meta data attached to it
-    if response == None:
-        raise RuntimeError("No response")
-    usage_metadata = response.usage_metadata
-    # If metadata data is none then api request failed
-    if usage_metadata == None:
-        raise RuntimeError("Failed Api Request")
-    if args.verbose == True:
-        print(f"User prompt: {prompt}")
-        # howing the number of tokens in the prompt that was sent to the model
-        print(f"Prompt tokens: {usage_metadata.prompt_token_count}")
-        # showing the number of tokens in the model's response.
-        print(f"Response tokens: {usage_metadata.candidates_token_count}")
-    function_call_results  = []
-    if response.function_calls:
-        for function_call in response.function_calls:
-            function_call_result : types.Content = call_function(function_call, verbose= args.verbose)
-            if not function_call_result.parts:
-                raise Exception("Function call response has no parts")
-            if not function_call_result.parts[0].function_response:
-                raise Exception("call_function return has no function Response")
-            if not function_call_result.parts[0].function_response.response:
-                raise Exception("Call function return has no funtion response.response")
-            function_call_results.append(function_call_result.parts[0])
-            if args.verbose:
-                print(f"-> {function_call_result.parts[0].function_response.response}")
-        
+    for _ in range(20):
+        try : 
+            # clients.model is a sub object that contains the contains the method generate content that can either take a string prompt
+            # or it can take a types.content list where each types.content can be thought as a single message between user and model
+            # Types.content has two fields one is role other is "parts" which is a list of part because each message can contain multiple part such as an image and text
+            #print([fd.name for fd in available_functions.function_declarations])
+            response = client.models.generate_content(model = "gemini-2.5-flash",contents = messages, config= config)
+        except Exception as e:
+           raise Exception(e)
+        # Each response has some meta data attached to it
+        if response == None:
+            raise RuntimeError("No response")
+        usage_metadata = response.usage_metadata
+        # If metadata data is none then api request failed
+        if usage_metadata == None:
+            raise RuntimeError("Failed Api Request")
+        # Each response has candidate which is the models response to the prompt
+        # Each candidate has content which is the types.content
+        if response.candidates:
+            for candidate in response.candidates:
+                messages.append(candidate.content)
+        if args.verbose == True:
+            print(f"User prompt: {prompt}")
+            # howing the number of tokens in the prompt that was sent to the model
+            print(f"Prompt tokens: {usage_metadata.prompt_token_count}")
+            # showing the number of tokens in the model's response.
+            print(f"Response tokens: {usage_metadata.candidates_token_count}")
+        function_call_results : list[types.Part]  = []
+        if response.function_calls:
+            for function_call in response.function_calls:
+                function_call_result : types.Content = call_function(function_call, verbose= args.verbose)
+                if not function_call_result.parts:
+                    raise Exception("Function call response has no parts")
+                if not function_call_result.parts[0].function_response:
+                    raise Exception("call_function return has no function Response")
+                if not function_call_result.parts[0].function_response.response:
+                    raise Exception("Call function return has no funtion response.response")
+                function_call_results.append(function_call_result.parts[0])
+                if args.verbose:
+                    print(f"-> {function_call_result.parts[0].function_response.response}")
+            
+        else:
+            print("Response:")
+            print(response.text)
+            # In case of response text break
+            break
+        messages.append(types.Content(role="user", parts=function_call_results))
+    # This is a for else, if the loop ended without break, then this mean model has not finished
     else:
-        print("Response:")
-        print(response.text)
-    
+        print("Maximum iterations reached exiting")
+        exit(1)
+        
 
 if __name__ == "__main__":
     main()
