@@ -15,7 +15,7 @@ def call_function(function_call: types.FunctionCall, verbose=False):
         print(f"Calling function: {function_call.name}({function_call.args})")
     else:
         print(f" - Calling function: {function_call.name}")
-    
+    # Create a function map to dispacth function based on function_call.name
     function_map = {
         "get_files_info" : get_files_info,
         "get_file_content": get_file_content,
@@ -24,6 +24,7 @@ def call_function(function_call: types.FunctionCall, verbose=False):
     }
     # function_call.name can be none in that case we assign it ""
     function_name = function_call.name or ""
+    # FUnction given by llm can not be from available functions thus we return an errorf
     if function_name not in function_map:
         return types.Content(
             role="tool",

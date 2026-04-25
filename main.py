@@ -64,8 +64,8 @@ def main():
                 print(f"-> {function_call_result.parts[0].function_response.response}")
         
     else:
-        ("Response:")
-        (response.text)
+        print("Response:")
+        print(response.text)
     
 
 if __name__ == "__main__":
