@@ -3,6 +3,7 @@ from functions.get_files_info import schema_get_files_info,get_files_info
 from functions.get_file_content import schema_get_file_content,get_file_content
 from functions.write_file import schema_write_file,write_file
 from functions.run_python_file import schema_run_python_file ,run_python_file
+from config import WORKING_DIRECTORY
 # types.FunctionDeclaration -- describes a single function (its name, description, and parameters).
 # types.Tool -- a container that holds a list of FunctionDeclaration objects (related functions grouped together).
 available_functions = types.Tool(
@@ -38,7 +39,7 @@ def call_function(function_call: types.FunctionCall, verbose=False):
     # We create a  shallwcopy of this as we need to inject the working directory in to the args
     args = dict(function_call.args) if function_call.args else {}
     # Inject the working directory added to the arguments
-    args["working_directory"] = "./calculator"
+    args["working_directory"] = WORKING_DIRECTORY
     # The ** operator automatically adds the dictionary arguments to the functions
     function_result: str = function_map[function_name](**args)
     # return the succesful result
