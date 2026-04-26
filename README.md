@@ -10,7 +10,8 @@ A toy AI coding agent built with the Google Gemini API. It can explore a working
 ## Setup
 1. Install dependencies with `uv sync`
 2. Add your `GEMINI_API_KEY` to a `.env` file
-3. Run: `uv run main.py "your prompt here"`
+3. Set `WORKING_DIRECTORY` in `config.py`
+4. Run: `uv run main.py "your prompt here"`
 
 ## Project Structure
 - `main.py` — entry point and agent loop
